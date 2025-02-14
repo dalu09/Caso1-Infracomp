@@ -23,25 +23,25 @@ public class Calidad extends Thread{
     public void run() {
         super.run();
 
-        while(true){
-
-            if(fin && !revision.hayEnRevision()) break;
+        while(!(fin && !revision.hayEnRevision())){
 
             if(revision.hayEnRevision()){
-                revision.cogerRevision();
+                int idP = revision.cogerRevision();
+
+                if(idP == -1) continue;
 
                 if(controlCalidad()){
                     if(deposito.cantidadDeposito() >= totalAProcesar && !yaSeEnvioFin){
                         fin = true;
                         yaSeEnvioFin = true;
                         System.out.println("FIN SE ENVIA A BUZON DE REPROCESO.");
-                        reproceso.agregarReproceso("FIN");
+                        reproceso.agregarReproceso("FIN", idP);
                     } else {
-                        deposito.agregarEnDeposito();
+                        deposito.agregarEnDeposito(idP);
                     }
                 } else {
                     contadorFallos++;
-                    reproceso.agregarReproceso("");
+                    reproceso.agregarReproceso("", idP);
                 }
             }
             Thread.yield();

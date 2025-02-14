@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,10 +25,10 @@ public class Main {
         Calidad.agregarReproceso(reproceso);
         Calidad.agregarRevision(revision);
         Calidad.agregarDeposito(deposito);
-        Calidad.agregarLimiteFallos((int)(Math.floor(nProductos * 0.1)));
+        Calidad.agregarLimiteFallos((int) (Math.floor(nProductos * 0.1)));
         Calidad.setTotalAProcesar(nProductos);
 
-        for(int i = 0; i < nOperarios; i++){
+        for (int i = 0; i < nOperarios; i++) {
             Productor prod = new Productor(i);
             Calidad qual = new Calidad(i);
 

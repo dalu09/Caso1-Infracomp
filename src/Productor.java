@@ -5,6 +5,7 @@ class Productor extends Thread {
     private static Revision revision;
 
     private static boolean fin = false;
+    private static int idCounterProductos = 0;
 
     Productor(int id){
         this.id = id;
@@ -19,29 +20,41 @@ class Productor extends Thread {
 
             switch (res) {
                 case "NO" -> { // no hay nada en reproceso -> crea
-                    System.out.println("Productor #" + ((int) id) + " crea producto.");
-                    pasarProducto();
+                    int cId = getContador();
+                    System.out.println("Productor #" + ((int) id) + " crea producto #" + cId + ".");
+                    pasarProducto(cId);
                 }
                 case "SI" -> {
-                    System.out.println("Productor #" + ((int) id) + " reprocesa producto.");
-                    reproceso.cogerProducto();
-                    pasarProducto();
+                    int idRecepcion = reproceso.cogerProducto();
+                    if(idRecepcion == -1) continue;
+
+                    System.out.println("Productor #" + ((int) id) + " reprocesa producto #" + idRecepcion + ".");
+                    pasarProducto(idRecepcion);
                 }
                 case "FIN" -> {
                     fin = true;
+                    break;
                 }
             }
         }
 
         System.out.println("FIN PRODUCTOR #" + id);
+
+        revision.checkFin();
     }
 
-    private synchronized void pasarProducto(){
-        if(revision.hayEspacio()){
-            revision.crearNuevo();
-        } else {
+    private synchronized int getContador(){
+        idCounterProductos++;
+        return idCounterProductos;
+    }
+
+    private synchronized void pasarProducto(int idP){
+        while (!revision.hayEspacio()) {
+            if(fin) return;
             revision.esperarEspacio();
         }
+
+        revision.crearNuevo(idP);
     }
 
     public static void agregarReproceso(Reproceso reprocesoInput){
